@@ -1,0 +1,22 @@
+{
+	"name": "sqltokens",
+	"version": "0.0.1",
+	"description": "",
+	"keywords": ["sql", "builder", "sql builder", "sql helper", "postgres", "token"],
+	"homepage": "http://github.com/williamwicks/sqltokens",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/williamwicks/sqltokens.git"
+	},
+	"author"  : {
+		"name"  : "William Wicks",
+		"email" : "wjwicks@gmail.com"
+	},
+	"devDependencies": {
+	},
+	"main": "sqltokens",
+	"engines": {
+		"node": "*"
+	},
+	"licenses": [{"type": "MIT", "url": "http://www.opensource.org/licenses/MIT"}]
+}
