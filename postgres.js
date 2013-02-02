@@ -117,11 +117,13 @@ var writers = {
 	},
 	ORDERBY: function(stmt, out){
 		if(out.length) out.push(' ');
-		out.push('ORDER BY ', stmt.expression);
+		out.push('ORDER BY ');
+		out.push.apply(out, stmt.param);
 	},
 	GROUPBY: function(stmt, out){
 		if(out.length) out.push(' ');
-		out.push('GROUP BY ', stmt.expression);
+		out.push('GROUP BY ');
+		out.push.apply(out, stmt.param);
 	},
 	LIMIT: function(stmt, out){
 		if(out.length) out.push(' ');

@@ -80,10 +80,6 @@ function Group(token, args){
 
 	return group;
 }
-function ExpressionOnly(token, expression){
-	if(typeof expression!=="string") return Empty;
-	return new Statement(token, expression);
-}
 function NumberOnly(token, number){
 	if(isNaN(number)) number = 0;
 	return new Statement(token, number.toString());
@@ -147,7 +143,8 @@ var tokens = module.exports = {
 		return new Param([new Param(low), new Param(high)], 'BETWEEN');
 	},
 	FROM: function(table){
-		return ExpressionOnly('FROM', table);
+		if(typeof table!=="string") return Empty;
+		return new Statement('FROM', table);
 	},
 	SET: function(data){
 		if(!data || Object.keys(data).length===0)
@@ -155,10 +152,14 @@ var tokens = module.exports = {
 		return new Statement('SET', null, data);
 	},
 	ORDERBY: function(columns){
-		return ExpressionOnly('ORDERBY', columns);
+		var columns = examineColumns(arguments);
+		if(!columns.length) return Empty;
+		return new Statement('ORDERBY', null, columns);
 	},
-	GROUPBY: function(columns){
-		return ExpressionOnly('GROUPBY', columns);
+	GROUPBY: function(){
+		var columns = examineColumns(arguments);
+		if(!columns.length) return Empty;
+		return new Statement('GROUPBY', null, columns);
 	},
 	LIMIT: function(number){
 		return NumberOnly('LIMIT', number);
@@ -167,6 +168,18 @@ var tokens = module.exports = {
 		return NumberOnly('OFFSET', number);
 	}
 };
+function examineColumns(args){
+	var columns = args[0];
+	if(!Array.isArray(columns))
+		columns = slice(args);
+	columns = columns.filter(removeNonStrings);
+	return columns.map(function(item){
+		return (item instanceof Param)? item : new Param(item);
+	})
+}
+function removeNonStrings(item){
+	return (typeof item === "string") || (item instanceof Param && typeof item.v ==="string");
+}
 
 function Context(){
 	var params=[], sql="",i=0;

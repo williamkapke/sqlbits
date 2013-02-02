@@ -253,7 +253,7 @@ vows.describe("sqltokens tests")
 			},
 			BOOKEND:{}
 		},
-		"FROM/ORDERBY/GROUPBY": {//internally uses the same code
+		"FROM":{
 			"with no parameters": {
 				topic: FROM(),
 				'should return Empty': function(topic){
@@ -266,24 +266,62 @@ vows.describe("sqltokens tests")
 					assert.equal(Empty, topic);
 				}
 			},
-			"when valid for output": {
-				"(FROM)": {
-					topic: FROM("customers"),
-					'should have a "FROM" token': function(topic){
-						assert.equal("FROM", topic.token);
-					}
+			"with a table specified": {
+				topic: FROM("customers"),
+				'should have a "FROM" token': function(topic){
+					assert.equal("FROM", topic.token);
 				},
-				"(ORDERBY)": {
-					topic: ORDERBY("id"),
-					'should have an "ORDERBY" token': function(topic){
-						assert.equal("ORDERBY", topic.token);
-					}
+				'should add the table as the expression': function(topic){
+					assert.equal("customers", topic.expression);
+				}
+			},
+			BOOKEND:{}
+		},
+		"ORDERBY/GROUPBY": {//internally uses same code
+			"with no parameters": {
+				topic: ORDERBY(),
+				'should return Empty': function(topic){
+					assert.equal(Empty, topic);
+				}
+			},
+			"with undefined args": {
+				topic: ORDERBY(undefined),
+				'should return Empty': function(topic){
+					assert.equal(Empty, topic);
+				}
+			},
+			"with all undefined args":{
+				topic: ORDERBY(x,x,x),
+				'should return Empty': function(topic){
+					assert.equal(topic, Empty);
+				}
+			},
+			"with non-string args":{
+				topic: ORDERBY(1, new Date, $("id")),
+				'should be ignored': function(topic){
+					assert.isArray(topic.param);
+					assert.lengthOf(topic.param, 1);
+					assert.equal(topic.param[0].v, "id");
+				}
+			},
+			"with args specified": {
+				topic: ORDERBY("id","date"),
+				'should assign an Array of the Params to Statement.param': function(topic){
+					assert.isArray(topic.param);
+					assert.lengthOf(topic.param, 2);
 				},
-				"(GROUPBY)": {
-					topic: GROUPBY("id"),
-					'should have a "GROUPBY" token': function(topic){
-						assert.equal("GROUPBY", topic.token);
-					}
+				'should have all Param objects': function(topic){
+					assert.isArray(topic.param);
+					topic.param.forEach(function(param){
+						assert.instanceOf(param, Param);
+					});
+				}
+			},
+			"with an array passed in": {
+				topic: ORDERBY(["id","date"]),
+				'Statement.param should be an Array': function(topic){
+					assert.isArray(topic.param);
+					assert.lengthOf(topic.param, 2);
 				}
 			},
 			BOOKEND:{}

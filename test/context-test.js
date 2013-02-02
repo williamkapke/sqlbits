@@ -263,30 +263,28 @@ vows.describe("sqltokens tests")
 					assert.equal("SELECT id", topic[0].toString());
 					assert.equal(" AND(1=1 AND 2=2)", topic[1].toString());
 				}
-			},
-			'should accumulate the indivual statements & params': function(topic){
-//				console.log(topic);
-//				assert.equal("AND(1=1 AND 2=2)", topic.sql);
 			}
 		},
-		"FROM/ORDERBY/GROUPBY": {//internally uses the same code
+		"FROM": {
+			"with the table supplied": {
+				topic: SQL(FROM("customers")),
+				'should output the statement with the table': function(topic){
+					assert.equal("FROM customers", topic.sql);
+				}
+			}
+		},
+		"ORDERBY/GROUPBY": {//internally uses the same code
 			"with the expression": {
-				"(FROM)": {
-					topic: SQL(FROM("customers")),
-					'should output the statement with the expression': function(topic){
-						assert.equal("FROM customers", topic.sql);
-					}
-				},
 				"(ORDERBY)": {
 					topic: SQL(ORDERBY("id")),
 					'should output the statement with the expression': function(topic){
-						assert.equal("ORDER BY id", topic.sql);
+						assert.equal("ORDER BY $1", topic.sql);
 					}
 				},
 				"(GROUPBY)": {
 					topic: SQL(GROUPBY("id")),
 					'should output the statement with the expression': function(topic){
-						assert.equal("GROUP BY id", topic.sql);
+						assert.equal("GROUP BY $1", topic.sql);
 					}
 				}
 			},
@@ -305,6 +303,12 @@ vows.describe("sqltokens tests")
 					'should output the statement with the expression': function(topic){
 						assert.equal("OFFSET 99", topic.sql);
 					}
+				}
+			},
+			"with a non-number arg":{
+				topic: SQL(LIMIT("sleepy dogs")),
+				'should default to 0': function(topic){
+					assert.equal("LIMIT 0", topic.sql);
 				}
 			},
 			BOOKEND:{}
