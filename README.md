@@ -15,13 +15,29 @@ console.log(query.params);
 //[ 'Tom', 18, 25 ]
 ```
 
+
 ### The "bits"
 The project is named `Sqlbits` because it aims to only provide _**bits of help**_ with building SQL query strings. You can use a `bit` to generate pieces of a query **or** in conjunction with other `bits` to form a complete query... if that's what raises your flag.
 
 There are 3 types of `bits`: [Contexts](#contexts), [Statements](#statements), [Params](#params)
 
+### undefined values
+By design, most statements **will not** output if all associated parameters are undefined. This example omits the first `AND` statement because the `IN` [Param](#params) only has `undefined` values:
+```javascript
+var bits = require('sqlbits'),
+	x, y, z;//intentionally undefined
+
+with(bits)//GASP! OMG! ..<rant>The Crock can bite me</rant>
+
+console.log(
+	SQL(    AND("id", IN(x,y,z), OR("1=1")    ))+""
+);
+//AND(1=1)
+```
+
+
 ### Chaining
-`Bits` are chainable with other `bits`, but makes no effort to ensure that the chained `bits` form logical output. For instance:
+`Bits` are chainable with other `bits`, but no effort is made to ensure that the chained `bits` form logical output. For instance:
 ```javascript
 var bits = require('sqlbits')
     SELECT = bits.SELECT;
@@ -33,7 +49,6 @@ console.log(query+";");
 ```
 
 Perhaps in some future world that output will be desired.
-
 
 
 ### Installation
@@ -91,6 +106,16 @@ console.log(    SELECT().FROM("foo")+""   );
 
 ### UPDATE([table])
 Creates a [Context](#context) that starts with a `UPDATE` statement. If the table argument is `undefined` the `UPDATE` statement will not output.
+```javascript
+var bits = require('sqlbits'), UPDATE=bits.UPDATE,
+	users;//intentionally undefined
+
+console.log(    UPDATE("passwords")+""   );
+//UPDATE passwords
+
+console.log(    UPDATE(users).SET({first:"Nic",last:"Wicks"})+""   );
+//SET first=$1,last=$2
+```
 
 ### DELETE.FROM(table)
 ### INSERT.INTO(table, values)
@@ -119,12 +144,18 @@ console.log(ctx.sql, ctx.params);
 
 ## Statements
 
-## Params
-### INSERT.INTO
-
-
-
-
 ### AND/OR/WHERE/ON([expression[,param]][,bit][,bit]...)
 (These statements all work the same)
+
+### SET(data)
+### FROM(table)
+### 
+
+## Params
+### $(value)
+### IN(array)
+### IN([value][,value]...)
+
+### BETWEEN(min,max)
+
 
