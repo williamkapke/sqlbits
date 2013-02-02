@@ -3,6 +3,7 @@ var vows = require('vows'),
 	assert = require('assert'),
 	bits = require('./../bits'),
 	SELECT=bits.SELECT,
+	DELETE=bits.DELETE,
 	x//used as an undefined value
 ;
 
@@ -42,6 +43,28 @@ vows.describe("SELECT tests")
 						assert.equal(topic.toString(), "SELECT 1=1");
 						assert.lengthOf(topic.params, 0);
 					}
+				}
+			},
+			BOOKEND:{}
+		},
+		"DELETE FORM": {
+			"without a table":{
+				topic: DELETE.FROM(),
+				"should be a context":function(topic){
+					assert.instanceOf(topic, bits.Context);
+					assert.instanceOf(topic, bits.PGContext);
+				}
+			},
+			"with a table specified":{
+				topic: DELETE.FROM("history"),
+				"should output the statement with the table":function(topic){
+					assert.equal("DELETE FROM history", topic.toString());
+				}
+			},
+			"with an undefined table and a chain":{
+				topic: DELETE.FROM(x).WHERE("something='bad'"),
+				"should output the statement with the table":function(topic){
+					assert.equal("WHERE(something='bad')", topic.toString());
 				}
 			},
 			BOOKEND:{}

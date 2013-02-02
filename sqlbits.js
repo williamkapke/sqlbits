@@ -97,6 +97,7 @@ var tokens = module.exports = {
 	ON: function ON(){ return Group('ON', arguments); },
 	WHERE: function WHERE(){ return Group('WHERE', arguments); },
 	"DELETE FROM": function(table){
+		if(typeof table!=="string") return Empty;
 		return new Statement('DELETE FROM', table);
 	},
 	"INSERT INTO": function(table, data){
@@ -202,6 +203,7 @@ function Context(){
 	});
 	this.parameterize = function parameterize(){
 		var out = this.out;
+		console.log(out);
 		for(;i<out.length;i++){
 			var item = out[i];
 			if(typeof item !== "string"){
