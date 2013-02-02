@@ -1,20 +1,21 @@
 {
-	"name": "sqltokens",
+	"name": "sqlbits",
 	"version": "0.0.1",
-	"description": "",
-	"keywords": ["sql", "builder", "sql builder", "sql helper", "postgres", "token"],
-	"homepage": "http://github.com/williamwicks/sqltokens",
+	"description": "An assortment of powerful & well tested functions that assist in building SQL statements",
+	"keywords": ["sql", "builder", "sql builder", "sql helper", "postgres"],
+	"homepage": "http://github.com/williamwicks/sqlbits",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/williamwicks/sqltokens.git"
+		"url": "https://github.com/williamwicks/sqlbits.git"
 	},
 	"author"  : {
 		"name"  : "William Wicks",
 		"email" : "wjwicks@gmail.com"
 	},
 	"devDependencies": {
+		"vows":"*"
 	},
-	"main": "sqltokens",
+	"main": "bits.js",
 	"engines": {
 		"node": "*"
 	},

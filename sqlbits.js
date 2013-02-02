@@ -2,9 +2,6 @@
 var slice = Object.call.bind(Array.prototype.slice);
 var forEach = Object.call.bind(Array.prototype.forEach);
 var isToken = RegExp.prototype.test.bind(/^[A-Z]+$/);
-function makeArray(args){
-	return Array.isArray(args[0])? args[0] : slice(args);
-}
 
 function Statement(token, expression, param){
 	this.token = token;
@@ -30,7 +27,7 @@ function Group(token, args){
 
 	if(args && args.length){
 		//$(expression[,param])
-		if(typeof args[0]==="string"){
+		if(typeof args[0]==="string" && token!='_'){
 			var param = args[1];
 			if(param instanceof Param){
 				i=2;
@@ -53,11 +50,18 @@ function Group(token, args){
 					subargs.push(param)
 				}
 
-				var member = tokens[arg.name](subargs);
+				var member = tokens[arg.name].apply(this, subargs);
 				if(member!==Empty) group.push(member);
 			}
 			else if((arg instanceof Statement && arg!==Empty) || (Array.isArray(arg) && arg.token)){
 				group.push(arg);
+			}
+			else if(arg instanceof Param){
+				if(arg.hasOwnProperty("v"))
+					group.push(arg);
+			}
+			else if(typeof arg==="string"){
+				group.push(new Statement('_', arg));
 			}
 		}
 	}
@@ -84,33 +88,30 @@ function NumberOnly(token, number){
 	if(isNaN(number)) number = 0;
 	return new Statement(token, number.toString());
 }
-
 var tokens = module.exports = {
 	$: function $(arg0){
-		if(arguments.length<=1 && /string|number|undefined/.test(typeof arg0)){
+		if(arguments.length<=1 && (!(arg0 instanceof Statement) || typeof arg0==="undefined")){
 			return Param(arg0);
 		}
-		return Group('$', makeArray(arguments));
+		return Group('$', arguments);
 	},
-	AND: function AND(){
-		return Group('AND', makeArray(arguments));
-	},
-	OR: function OR(){
-		return Group('OR', makeArray(arguments));
-	},
-	WHERE: function WHERE(){
-		return Group('WHERE', makeArray(arguments));
-	},
-	"DELETE FROM":{
-		//
+	_: function _(){ return Group('_', arguments); },
+	AND: function AND(){ return Group('AND', arguments); },
+	OR: function OR(){ return Group('OR', arguments); },
+	ON: function ON(){ return Group('ON', arguments); },
+	WHERE: function WHERE(){ return Group('WHERE', arguments); },
+	"DELETE FROM": function(table){
+		return new Statement('DELETE FROM', table);
 	},
 	"INSERT INTO": function(table, data){
-		if(typeof table !== "string") return Empty;
+		if(typeof table !== "string" || !data) return Empty;
 		var columns = Object.keys(data);
 		if(columns.length===0) return Empty;
 		var params = [];
-		columns.forEach(function(column){ params.push(new Param(columns[column])); });
-		return new Statement('INTO', columns, params);
+		columns.forEach(function(column){
+			params.push(new Param(data[column]));
+		});
+		return new Statement('INSERT INTO', table, [columns,params]);
 	},
 	IN: function IN(){
 		var out = [];
@@ -147,6 +148,11 @@ var tokens = module.exports = {
 	},
 	FROM: function(table){
 		return ExpressionOnly('FROM', table);
+	},
+	SET: function(data){
+		if(!data || Object.keys(data).length===0)
+			return Empty;
+		return new Statement('SET', null, data);
 	},
 	ORDERBY: function(columns){
 		return ExpressionOnly('ORDERBY', columns);
@@ -204,14 +210,20 @@ Context.prototype = {
 	processToken: function(){
 		throw new Error("Not Implemented");
 	},
+	SQL: function(){
+		var stmt = tokens._.apply(this, arguments);
+		return processAndReturnSubcontext(stmt, this);
+	},
 	SELECT: function(expression){
-		return processAndReturnSubcontext(new Statement('SELECT', expression), this);
+		var stmt = typeof expression==="string"? new Statement('SELECT', expression) : Empty;
+		return processAndReturnSubcontext(stmt, this);
 	},
 	get INSERT(){
 		var ctx = this;
 		return {
 			INTO: function(table){
-				return processAndReturnSubcontext(new Statement('INSERT INTO', table), ctx);
+				var stmt = typeof table==="string"? new Statement('INSERT INTO', table) : Empty;
+				return processAndReturnSubcontext(stmt, ctx);
 			}
 		}
 	},
@@ -219,12 +231,14 @@ Context.prototype = {
 		var ctx = this;
 		return {
 			FROM: function(table){
-				return processAndReturnSubcontext(new Statement('DELETE FROM', table), ctx);
+				var stmt = typeof table==="string"? new Statement('DELETE FROM', table) : Empty;
+				return processAndReturnSubcontext(stmt, ctx);
 			}
 		}
 	},
 	UPDATE: function(table){
-		return processAndReturnSubcontext(new Statement('INSERT INTO', table), this);
+		var stmt = typeof table==="string"? new Statement('UPDATE', table) : Empty;
+		return processAndReturnSubcontext(stmt, this);
 	}
 };
 Object.keys(tokens).forEach(function(key){
@@ -243,7 +257,7 @@ function processAndReturnSubcontext(stmt, parent){
 
 	var sub = { end:parent.out.length };
 	sub.toString = function(){
-		parent.parameterize();
+		parent.params;//for it to parameterize
 		return parent.out.slice(start, this.end).join('');
 	};
 	sub.__proto__=parent;
