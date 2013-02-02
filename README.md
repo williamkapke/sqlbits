@@ -36,6 +36,22 @@ console.log(
 ```
 
 
+### Syntactic Sugar
+> In computer science, syntactic sugar is syntax within a programming 
+> language that is designed to make things easier to read or to express.
+-[Wikipedia](http://en.wikipedia.org/wiki/Syntactic_sugar)
+
+That's all `Sqlbits` is. No ORM. No database connectivity. Just sugar.
+
+We all know about SQL injection (hopefully). Concatenating strings with parameters isn't hard- but 
+things can get ugly fast. Consider queries that return data based on different conditions. This is 
+very common for reports. For example: "transactions for product $1 between $2 & $3 for user $4" but 
+you want these conditions to be optional. Concatenating a query like that (AND keeping track of the 
+params) gets ugly. This is why `Sqlbits` omits things when their params are [undefined](#undefinedvalues).
+```javascript
+```
+
+
 ### Chaining
 `Bits` are chainable with other `bits`, but no effort is made to ensure that the chained `bits` form logical output. For instance:
 ```javascript
