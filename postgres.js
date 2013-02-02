@@ -76,7 +76,6 @@ var writers = {
 		out.push('SELECT ', stmt.expression);
 	},
 	UPDATE: function UPDATE(stmt, out){
-		console.log("asdf");
 		if(out.length) out.push(' ');
 		out.push('UPDATE ', stmt.expression);
 	},
