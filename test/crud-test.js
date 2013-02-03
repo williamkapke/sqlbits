@@ -64,7 +64,7 @@ vows.describe("SELECT tests")
 			"with an undefined table and a chain":{
 				topic: DELETE.FROM(x).WHERE("something='bad'"),
 				"should output the statement with the table":function(topic){
-					assert.equal("WHERE(something='bad')", topic.toString());
+					assert.equal("WHERE something='bad'", topic.toString());
 				}
 			},
 			BOOKEND:{}

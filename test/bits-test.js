@@ -48,6 +48,24 @@ vows.describe("sqltokens tests")
 					assert.equal(topic.v, 99);
 				}
 			},
+			"with ASC": {
+				topic: $("id").ASC,
+				'should return Param': function(topic){
+					assert.instanceOf(topic, Param);
+				},
+				'should have ASC assigned to token property': function(topic){
+					assert.equal('ASC', topic.token);
+				}
+			},
+			"with DESC": {
+				topic: $("id").DESC,
+				'should return Param': function(topic){
+					assert.instanceOf(topic, Param);
+				},
+				'should have DESC assigned to token property': function(topic){
+					assert.equal('DESC', topic.token);
+				}
+			},
 			BOOKEND:{}
 		},
 		"IN": {
@@ -277,51 +295,59 @@ vows.describe("sqltokens tests")
 			},
 			BOOKEND:{}
 		},
-		"ORDERBY/GROUPBY": {//internally uses same code
+		"ORDERBY/GROUPBY": {//internally uses the same code
 			"with no parameters": {
-				topic: ORDERBY(),
+				topic: GROUPBY(),
 				'should return Empty': function(topic){
 					assert.equal(Empty, topic);
 				}
 			},
-			"with undefined args": {
-				topic: ORDERBY(undefined),
+			"with an undefined arg": {
+				topic: GROUPBY(undefined),
 				'should return Empty': function(topic){
 					assert.equal(Empty, topic);
 				}
 			},
 			"with all undefined args":{
-				topic: ORDERBY(x,x,x),
+				topic: GROUPBY(x,x,x),
 				'should return Empty': function(topic){
 					assert.equal(topic, Empty);
 				}
 			},
-			"with non-string args":{
-				topic: ORDERBY(1, new Date, $("id")),
-				'should be ignored': function(topic){
-					assert.isArray(topic.param);
-					assert.lengthOf(topic.param, 1);
-					assert.equal(topic.param[0].v, "id");
+			"with a column specified":{
+				topic: GROUPBY("id"),
+				'should assign an Array of the arguments to Statement.args': function(topic){
+					assert.isArray(topic.args);
+					assert.lengthOf(topic.args, 1);
+				},
+				'should the statement and the column': function(topic){
+					assert.typeOf(topic.args[0], "string");
 				}
 			},
 			"with args specified": {
-				topic: ORDERBY("id","date"),
-				'should assign an Array of the Params to Statement.param': function(topic){
-					assert.isArray(topic.param);
-					assert.lengthOf(topic.param, 2);
-				},
-				'should have all Param objects': function(topic){
-					assert.isArray(topic.param);
-					topic.param.forEach(function(param){
-						assert.instanceOf(param, Param);
+				topic: GROUPBY("id", 1, new Date, $("date"), "type"),
+				'should ignore non-string or Params values': function(topic){
+					assert.isArray(topic.args);
+					topic.args.forEach(function(item){
+						var isValid = item instanceof Param || typeof item === "string";
+						assert.isTrue(isValid);
 					});
 				}
 			},
 			"with an array passed in": {
-				topic: ORDERBY(["id","date"]),
-				'Statement.param should be an Array': function(topic){
-					assert.isArray(topic.param);
-					assert.lengthOf(topic.param, 2);
+				topic: GROUPBY(["id",1,"date"]),
+				'should assign an Array of the arguments to Statement.args': function(topic){
+					assert.isArray(topic.args);
+				},
+				'should ignore non-strings': function(topic){
+					assert.lengthOf(topic.args, 2);
+				},
+				'should make all items Param objects': function(topic){
+					assert.isArray(topic.args);
+					topic.args.forEach(function(item){
+						assert.instanceOf(item, Param);
+						assert.typeOf(item.v, "string");
+					});
 				}
 			},
 			BOOKEND:{}

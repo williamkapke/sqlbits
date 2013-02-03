@@ -141,6 +141,7 @@ vows.describe("sqltokens tests")
 				},
 				'should contribute 1 param': function(topic){
 					assert.lengthOf(topic.params, 1);
+					assert.equal(topic.params[0], 1);
 				}
 			},
 			"passing only a max": {
@@ -150,6 +151,7 @@ vows.describe("sqltokens tests")
 				},
 				'should contribute 1 param': function(topic){
 					assert.lengthOf(topic.params, 1);
+					assert.equal(topic.params[0], 1);
 				}
 			},
 			"additional statements": {
@@ -274,18 +276,34 @@ vows.describe("sqltokens tests")
 			}
 		},
 		"ORDERBY/GROUPBY": {//internally uses the same code
-			"with the expression": {
-				"(ORDERBY)": {
-					topic: SQL(ORDERBY("id")),
-					'should output the statement with the expression': function(topic){
-						assert.equal("ORDER BY $1", topic.sql);
-					}
-				},
-				"(GROUPBY)": {
-					topic: SQL(GROUPBY("id")),
-					'should output the statement with the expression': function(topic){
-						assert.equal("GROUP BY $1", topic.sql);
-					}
+			"with a string arg": {
+				topic: SQL(GROUPBY("id")),
+				'should output the statement with the column': function(topic){
+					assert.equal("GROUP BY id", topic.sql);
+				}
+			},
+			"with a Param arg": {
+				topic: SQL(GROUPBY($("id"))),
+				'should output the statement with the Param': function(topic){
+					assert.equal("GROUP BY $1", topic.sql);
+				}
+			},
+			"with a string and a Param arg": {
+				topic: SQL(GROUPBY("date",$("id"))),
+				'should output the string inline and then the Param': function(topic){
+					assert.equal("GROUP BY date,$1", topic.sql);
+				}
+			},
+			"with ASC/DESC": {
+				topic: SQL(ORDERBY("id", $("date").DESC, $("first").ASC)),
+				'should append DESC after the Param': function(topic){
+					assert.equal("ORDER BY id,$1 DESC,$2 ASC", topic.sql);
+				}
+			},
+			"with an Array arg": {
+				topic: SQL(GROUPBY([$("id"), "date"])),
+				'should output all Param items': function(topic){
+					assert.equal("GROUP BY $1,$2", topic.sql);
 				}
 			},
 			BOOKEND:{}

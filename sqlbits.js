@@ -16,11 +16,18 @@ function Param(value, token){
 		this.v=value;
 	if(token) this.token = token;
 }
-Param.prototype.toString=function(){
-	var tkn = this.token? this.token : '$';
-	return "[" + tkn + " Param]";
+Param.prototype = {
+	get DESC() {
+		return new Param(this.v, 'DESC');
+	},
+	get ASC() {
+		return new Param(this.v, 'ASC');
+	},
+	toString: function(){
+		var tkn = this.token? this.token : '$';
+		return "[" + tkn + " Param]";
+	}
 }
-
 function Group(token, args){
 	var group = [], i=0;
 	group.token=token;
@@ -153,14 +160,10 @@ var tokens = module.exports = {
 		return new Statement('SET', null, data);
 	},
 	ORDERBY: function(columns){
-		var columns = examineColumns(arguments);
-		if(!columns.length) return Empty;
-		return new Statement('ORDERBY', null, columns);
+		return xBY('ORDERBY', arguments)
 	},
 	GROUPBY: function(){
-		var columns = examineColumns(arguments);
-		if(!columns.length) return Empty;
-		return new Statement('GROUPBY', null, columns);
+		return xBY('GROUPBY', arguments)
 	},
 	LIMIT: function(number){
 		return NumberOnly('LIMIT', number);
@@ -169,17 +172,24 @@ var tokens = module.exports = {
 		return NumberOnly('OFFSET', number);
 	}
 };
-function examineColumns(args){
+function xBY(token, args){
 	var columns = args[0];
-	if(!Array.isArray(columns))
+	if(!Array.isArray(columns)){
 		columns = slice(args);
-	columns = columns.filter(removeNonStrings);
-	return columns.map(function(item){
-		return (item instanceof Param)? item : new Param(item);
-	})
-}
-function removeNonStrings(item){
-	return (typeof item === "string") || (item instanceof Param && typeof item.v ==="string");
+	}
+	else {
+		columns = columns.map(function(item){
+			return item instanceof Param? item: new Param(item);
+		});
+	}
+	args = columns.filter(function removeNonStrings(item){
+		return (typeof item === "string") || (item instanceof Param && typeof item.v ==="string");
+	});
+
+	if(!args.length) return Empty;
+	var stmt = new Statement(token)
+	stmt.args = args;
+	return stmt;
 }
 
 function Context(){
@@ -203,7 +213,6 @@ function Context(){
 	});
 	this.parameterize = function parameterize(){
 		var out = this.out;
-		console.log(out);
 		for(;i<out.length;i++){
 			var item = out[i];
 			if(typeof item !== "string"){
@@ -236,8 +245,8 @@ Context.prototype = {
 	get INSERT(){
 		var ctx = this;
 		return {
-			INTO: function(table){
-				var stmt = typeof table==="string"? new Statement('INSERT INTO', table) : Empty;
+			INTO: function(table, data){
+				var stmt = tokens["INSERT INTO"].apply(this, arguments);
 				return processAndReturnSubcontext(stmt, ctx);
 			}
 		}
@@ -246,7 +255,7 @@ Context.prototype = {
 		var ctx = this;
 		return {
 			FROM: function(table){
-				var stmt = typeof table==="string"? new Statement('DELETE FROM', table) : Empty;
+				var stmt = tokens["DELETE FROM"].apply(this, arguments);
 				return processAndReturnSubcontext(stmt, ctx);
 			}
 		}

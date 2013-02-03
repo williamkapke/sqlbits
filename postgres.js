@@ -47,11 +47,15 @@ var writers = {
 			}
 			else out.push(',');
 
-			if(item instanceof Param)
-				processParam(item, out);
-			else out.push(item);
+			processParam(item, out);
 		});
 		out.push(')');
+	},
+	ASC: function(param, out){
+		out.push(param, ' ASC');
+	},
+	DESC: function(param, out){
+		out.push(param, ' DESC');
 	},
 	BETWEEN: function BETWEEN(param, out){
 		var low = param.v[0];
@@ -60,12 +64,12 @@ var writers = {
 		if(out.length) out.push(' ');
 		if(low.v===undefined){
 			out.push('<=');
-			processParam(low, out);
+			processParam(high, out);
 			return;
 		}
 		if(high.v===undefined){
 			out.push('>=');
-			processParam(high, out);
+			processParam(low, out);
 			return;
 		}
 
@@ -100,10 +104,7 @@ var writers = {
 	"INSERT INTO": function FROM(stmt, out){
 		if(out.length) out.push(' ');
 		out.push('INSERT INTO ',stmt.expression,' (', stmt.param[0].join(','), ') VALUES (');
-		stmt.param[1].forEach(function(param, i){
-			if(i) out.push(',');
-			out.push(param);
-		});
+		stmt.param[1].forEach(csv, out);
 		out.push(')');
 	},
 	WHERE: GroupItem,
@@ -118,12 +119,12 @@ var writers = {
 	ORDERBY: function(stmt, out){
 		if(out.length) out.push(' ');
 		out.push('ORDER BY ');
-		out.push.apply(out, stmt.param);
+		stmt.args.forEach(csv, out);
 	},
 	GROUPBY: function(stmt, out){
 		if(out.length) out.push(' ');
 		out.push('GROUP BY ');
-		out.push.apply(out, stmt.param);
+		stmt.args.forEach(csv, out);
 	},
 	LIMIT: function(stmt, out){
 		if(out.length) out.push(' ');
@@ -133,6 +134,10 @@ var writers = {
 		if(out.length) out.push(' ');
 		out.push('OFFSET ', stmt.expression);
 	}
+}
+function csv(item, i){
+	if(i) this.push(',');
+	processParam(item, this);
 }
 function GroupItem(stmt, out){
 	if(stmt.token!='$'){
