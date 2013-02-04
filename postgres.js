@@ -73,7 +73,7 @@ var writers = {
 			return;
 		}
 
-		out.push('BETWEEN(', low, ' AND ', high, ')');
+		out.push('BETWEEN ', low, ' AND ', high);
 	},
 	SELECT: function SELECT(stmt, out){
 		if(out.length) out.push(' ');

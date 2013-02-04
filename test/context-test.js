@@ -128,7 +128,7 @@ vows.describe("sqltokens tests")
 			"passing a min & max": {
 				topic: SQL(BETWEEN(1,2)),
 				'should output "BETWEEN(min AND max)"': function(topic){
-					assert.equal("BETWEEN($1 AND $2)", topic.sql);
+					assert.equal("BETWEEN $1 AND $2", topic.sql);
 				},
 				'should contribute 2 params': function(topic){
 					assert.lengthOf(topic.params, 2);
@@ -157,7 +157,7 @@ vows.describe("sqltokens tests")
 			"additional statements": {
 				topic: SQL(BETWEEN($(0),$(1)), BETWEEN(800, "900")),
 				'should continue param numbering': function(topic){
-					assert.equal("BETWEEN($1 AND $2) BETWEEN($3 AND $4)", topic.sql);
+					assert.equal("BETWEEN $1 AND $2 BETWEEN $3 AND $4", topic.sql);
 					assert.lengthOf(topic.params, 4);
 				}
 			},
