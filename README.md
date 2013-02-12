@@ -10,7 +10,7 @@ var query =
 		.ORDERBY('last')
 
 console.log(query+";");
-//SELECT id,first,last,age FROM peeps WHERE(first=$1 AND age BETWEEN($2 AND $3)) ORDER BY last;
+//SELECT id,first,last,age FROM peeps WHERE(first=$1 AND age BETWEEN $2 AND $3) ORDER BY last;
 console.log(query.params);
 //[ 'Tom', 18, 25 ]
 ```
@@ -83,11 +83,11 @@ function example(data){ with(bits)
 }
 
 example({product:"widget",start:'01/01/2013',end:'02/01/2013',userid:6543,sortby:"purchased"});
-//SELECT * FROM sales WHERE(product=$1 AND purchased BETWEEN($2 AND $3) AND userid=$4) ORDER BY purchased;
+//SELECT * FROM sales WHERE(product=$1 AND purchased BETWEEN $2 AND $3 AND userid=$4) ORDER BY purchased;
 //[ 'widget', '01/01/2013', '02/01/2013', 6543 ]
 
 example({start:'01/01/2013',end:'02/01/2013',userid:6543,sortby:"purchased"});
-//SELECT * FROM sales WHERE(purchased BETWEEN($1 AND $2) AND userid=$3) ORDER BY purchased;
+//SELECT * FROM sales WHERE(purchased BETWEEN $1 AND $2 AND userid=$3) ORDER BY purchased;
 //[ '01/01/2013', '02/01/2013', 6543 ]
 
 example({end:'02/01/2013',userid:6543,sortby:"purchased"});
@@ -164,7 +164,7 @@ ctx.createParam = function(idx){ return '@p'+idx; };
 var query = ctx.SQL("SELECT TOP ", $(n), "FROM books WHERE author LIKE 'Tom%'", AND, "rating", BETWEEN(4.4, 5));
 
 console.log(query+";");
-//SELECT TOP @p1 FROM books WHERE author LIKE 'Tom%' AND rating BETWEEN(@p2 AND @p3);
+//SELECT TOP @p1 FROM books WHERE author LIKE 'Tom%' AND rating BETWEEN @p2 AND @p3;
 console.log(query.params);
 //[ 100, 4.4, 5 ]
 ```
@@ -440,7 +440,7 @@ var bits = require('sqlbits'), SELECT=bits.SELECT, $=bits.$, BETWEEN=bits.BETWEE
 	x;//intentionally undefined
 
 console.log( SELECT("*").FROM("numbers").WHERE("id", BETWEEN(1,99))+"" );
-//SELECT * FROM numbers WHERE id BETWEEN($1 AND $2)
+//SELECT * FROM numbers WHERE id BETWEEN $1 AND $2
 
 console.log( SELECT("*").FROM("numbers").WHERE("id", BETWEEN(1,x))+"" );
 //SELECT * FROM numbers WHERE id >=$1
