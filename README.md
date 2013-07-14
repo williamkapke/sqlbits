@@ -124,7 +124,7 @@ Perhaps in some future world that output will be desired.
 There is also a very general purpose function that is available on the context chain: `_()`. It allows you to directly 
 append to the output. This provides another way to ensure that `sqlbits` are just helpers that do not restrict you.
 ```javascript
-var bits = require('./bits'), SELECT = bits.SELECT;
+var bits = require('sqlbits'), SELECT = bits.SELECT;
 
 console.log(
 	SELECT('*').FROM("foo")._('LEFT OUTTER JOIN bar').ON("foo.id=bar.id")._(';').sql
@@ -231,7 +231,7 @@ Creates a [Context](#context) that starts with a `INSERT INTO` statement. If the
 the `INSERT INTO` statement will not output.
 
 ```javascript
-var bits = require('./bits'), INSERT=bits.INSERT, SQL=bits.SQL;
+var bits = require('sqlbits'), INSERT=bits.INSERT, SQL=bits.SQL;
 
 console.log(    INSERT.INTO("conversation", {at:"2013-01-23T19:09:27.793Z",text:"hi"})+""   );
 //INSERT INTO conversation (at,text) VALUES ($1,$2)
@@ -390,7 +390,7 @@ parameters in `ORDER BY` statements, but it is included so it is available for o
 The `$` function will produce a Param object if a non-[Statement](#statements) is passed in.
 
 ```javascript
-var bits = require('./bits'), $=bits.$, Param=bits.Param, SQL=bits.SQL;
+var bits = require('sqlbits'), $=bits.$, Param=bits.Param, SQL=bits.SQL;
 
 console.log(  $(1) instanceof Param  );
 //true
