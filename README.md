@@ -127,9 +127,9 @@ append to the output. This provides another way to ensure that `sqlbits` are jus
 var bits = require('sqlbits'), SELECT = bits.SELECT;
 
 console.log(
-	SELECT('*').FROM("foo")._('LEFT OUTTER JOIN bar').ON("foo.id=bar.id")._(';').sql
+	SELECT('*').FROM("foo")._('LEFT OUTER JOIN bar').ON("foo.id=bar.id")._(';').sql
 );
-//SELECT * FROM foo LEFT OUTTER JOIN bar ON foo.id=bar.id ;
+//SELECT * FROM foo LEFT OUTER JOIN bar ON foo.id=bar.id ;
 ```
 It isn't the most beautiful syntax, but it works.
 
