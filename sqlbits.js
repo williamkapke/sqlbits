@@ -195,21 +195,26 @@ function xBY(token, args){
 function Context(){
 	var params=[], sql="",i=0;
 	var out = this.out = [];
+	function getValues(){
+		if(out.length!=i){
+			this.parameterize();
+			sql = out.join('');
+		}
+		return params;
+	}
+	function getText(){
+		if(out.length!=i){
+			this.parameterize();
+			sql = out.join('');
+		}
+		return sql;
+	}
+
 	Object.defineProperties(this, {
-		sql: {get:function(){
-			if(out.length!=i){
-				this.parameterize();
-				sql = out.join('');
-			}
-			return sql;
-		}},
-		params: {get:function(){
-			if(out.length!=i){
-				this.parameterize();
-				sql = out.join('');
-			}
-			return params;
-		}}
+		sql: {get: getText},
+		text: {get: getText},
+		params: {get: getValues},
+		values: {get: getValues}
 	});
 	this.parameterize = function parameterize(){
 		var out = this.out;
