@@ -222,7 +222,9 @@ function Context(){
 			var item = out[i];
 			if(typeof item !== "string"){
 				var value = item.v;
-				var idx = params.indexOf(value);
+				// don't collate nulls, in SQL they are not equal
+				// Can cause inconsistent type deduced error in Postgres
+				var idx = (value === null) ? -1 : params.indexOf(value);
 				idx = (~idx? idx+1 : params.push(value) );
 				out[i] = this.createParam(idx);
 			}
