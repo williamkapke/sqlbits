@@ -65,6 +65,12 @@ vows.describe("sqltokens tests")
 					assert.equal(topic.params[0], 99);
 				}
 			},
+			"with multiple params in a row": {
+				topic: SQL("SELECT ", $(99), $(98), $(97)),
+				'should comma separate the $params': function(topic){
+					assert.equal("SELECT $1,$2,$3", topic.sql);
+				}
+			},
 			"when the variable is undefined":	{
 				topic: SQL($(x)),
 				'should return an empty string and should\'t add the param': function(topic){

@@ -8,14 +8,20 @@ var util = require('util'),
 var forEach = Object.call.bind(Array.prototype.forEach);
 var slice = Object.call.bind(Array.prototype.slice);
 
+function isTokenlessParam(obj){
+	return obj instanceof Param && !obj.token;
+}
 function processToken(stmt, out){
 	if(stmt===Empty) return;
 	if(Array.isArray(stmt) && stmt.token){
 		return processGroup(stmt, out);
 	}
 
-	if(stmt instanceof Param && !stmt.token)
+	if(isTokenlessParam(stmt)){
+		if(isTokenlessParam(out[out.length-1]))
+			out.push(',');
 		out.push(stmt);
+	}
 	else
 		writers[stmt.token||'$'](stmt, out);
 }
