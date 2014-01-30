@@ -67,6 +67,9 @@ function Group(token, args){
 				if(arg.hasOwnProperty("v"))
 					group.push(arg);
 			}
+			else if(arg instanceof Context){
+				Array.prototype.splice.apply(args, [i+1,0].concat(arg.out));
+			}
 			else if(typeof arg==="string"){
 				group.push(new Statement('_', arg));
 			}
@@ -193,19 +196,22 @@ function xBY(token, args){
 }
 
 function Context(){
-	var params=[], sql="",i=0;
+	var params=[], sql="";
+	var parameterized;
 	var out = this.out = [];
 	function getValues(){
-		if(out.length!=i){
-			this.parameterize();
-			sql = out.join('');
+		if(!parameterized){
+			parameterized = out.slice();
+			this.parameterize(parameterized, params);
+			sql = parameterized.join('');
 		}
 		return params;
 	}
 	function getText(){
-		if(out.length!=i){
-			this.parameterize();
-			sql = out.join('');
+		if(!parameterized){
+			parameterized = out.slice();
+			this.parameterize(parameterized, params);
+			sql = parameterized.join('');
 		}
 		return sql;
 	}
@@ -216,9 +222,8 @@ function Context(){
 		params: {get: getValues},
 		values: {get: getValues}
 	});
-	this.parameterize = function parameterize(){
-		var out = this.out;
-		for(;i<out.length;i++){
+	this.parameterize = function parameterize(out, params){
+		for(var i=0;i<out.length;i++){
 			var item = out[i];
 			if(typeof item !== "string"){
 				var value = item.v;

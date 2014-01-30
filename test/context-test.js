@@ -78,6 +78,13 @@ vows.describe("sqltokens tests")
 					assert.lengthOf(topic.params, 0);
 				}
 			},
+			"with nested contexts":{
+				topic: SQL("WITH bar AS (", SQL("SELECT 'foo',", $(10)), ")", $('quack')),
+				'should copy the sql & params into the parent': function(topic){
+					assert.equal("WITH bar AS ( SELECT 'foo',$1 )$2", topic.sql);
+					assert.lengthOf(topic.params, 2);
+				}
+			},
 			BOOKEND:{}
 		},
 		"IN": {
