@@ -109,9 +109,8 @@ var writers = {
 	},
 	"INSERT INTO": function FROM(stmt, out){
 		if(out.length) out.push(' ');
-		out.push('INSERT INTO ',stmt.expression,' (', stmt.param[0].join(','), ') VALUES (');
+		out.push('INSERT INTO ',stmt.expression,' (', stmt.param[0].join(','), ') SELECT ');
 		stmt.param[1].forEach(csv, out);
-		out.push(')');
 	},
 	WHERE: GroupItem,
 	AND: GroupItem,

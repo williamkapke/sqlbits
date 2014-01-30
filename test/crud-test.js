@@ -74,19 +74,19 @@ vows.describe("SELECT/DELETE/INSERT tests")
 			"object with duplicate non-null property values": {
 				topic: INSERT.INTO('foo', { bar: 10, cat: 20, dog: 10 }),
 				'should reuse non-null property values': function(topic){
-					assert.equal("INSERT INTO foo (bar,cat,dog) VALUES ($1,$2,$1)", topic.sql);
+					assert.equal("INSERT INTO foo (bar,cat,dog) SELECT $1,$2,$1", topic.sql);
 					assert.lengthOf(topic.params, 2);
 				}
 			},
 			"object with duplicate null params": {
 				topic: INSERT.INTO('foo', { bar: null, cat: 100, dog: null }),
 				'should not collapse null property values, nulls are not equal in SQL': function(topic){
-					assert.equal("INSERT INTO foo (bar,cat,dog) VALUES ($1,$2,$3)", topic.sql);
+					assert.equal("INSERT INTO foo (bar,cat,dog) SELECT $1,$2,$3", topic.sql);
 					assert.lengthOf(topic.params, 3);
 				}
 			},
 			BOOKEND:{}
-                },
+		},
 		BOOKEND:{}
 	})
 	.export(module);
