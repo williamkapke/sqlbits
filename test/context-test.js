@@ -243,6 +243,13 @@ vows.describe("sqltokens tests")
 					assert.lengthOf(topic.params, 3);
 				}
 			},
+			'with an Object as the parameter': {
+				topic: SQL(WHERE({a:1,b:2,c:3})),
+				'it should AND the properties': function(topic){
+					assert.equal("WHERE(a=$1 AND b=$2 AND c=$3)", topic.sql);
+					assert.lengthOf(topic.params, 3);
+				}
+			},
 			"with an expression": {
 				"(WHERE)": {
 					topic: SQL(WHERE("1=1")),

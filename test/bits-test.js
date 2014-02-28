@@ -269,6 +269,17 @@ vows.describe("sqltokens tests")
 					assert.equal('AND', topic.token);
 				}
 			},
+			"with an object":	{
+				topic: WHERE({a:1,b:2,c:3}),
+				'should AND the properties': function(topic){
+					assert.isArray(topic);
+					assert.lengthOf(topic, 3);
+					assert.deepEqual(topic[0], { token: 'AND', expression: 'a=', param: { v: 1 } });
+					assert.deepEqual(topic[1], { token: 'AND', expression: 'b=', param: { v: 2 } });
+					assert.deepEqual(topic[2], { token: 'AND', expression: 'c=', param: { v: 3 } });
+					assert.equal('WHERE', topic.token);
+				}
+			},
 			BOOKEND:{}
 		},
 		"FROM":{

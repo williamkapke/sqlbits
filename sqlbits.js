@@ -73,6 +73,11 @@ function Group(token, args){
 			else if(typeof arg==="string"){
 				group.push(new Statement('_', arg));
 			}
+			else if(typeof arg==="object" && arg!==Empty){
+				Object.keys(arg).forEach(function(k) {
+					group.push(tokens.AND(k+'=', tokens.$(arg[k])));
+				});
+			}
 		}
 	}
 
