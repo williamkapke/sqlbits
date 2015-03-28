@@ -71,6 +71,24 @@ vows.describe("sqltokens tests")
 					assert.equal("SELECT $1,$2,$3", topic.sql);
 				}
 			},
+            "with duplicate params":{
+				topic: SQL("SELECT ", $(11), $(22), $(null), $(11), $(null)),
+				'should not collapse duplicate $params': function(topic){
+					assert.equal("SELECT $1,$2,$3,$4,$5", topic.sql);
+                    assert.lengthOf(topic.params, 5);
+				}
+			},
+            "with duplicate params and collapse enabled":{
+				topic: function () {
+                    var sql = SQL("SELECT ", $(11), $(22), $(null), $(11), $(null));
+                    sql.collapse = true;
+                    return sql;
+                },
+				'should collapse duplicate $params that are not null': function(topic){
+					assert.equal("SELECT $1,$2,$3,$1,$4", topic.sql);
+                    assert.deepEqual(topic.params, [11,22,null,null]);
+				}
+			},
 			"when the variable is undefined":	{
 				topic: SQL($(x)),
 				'should return an empty string and should\'t add the param': function(topic){
@@ -121,10 +139,10 @@ vows.describe("sqltokens tests")
 			"additional statements": {
 				topic: SQL(IN($(5),"8",$(7)), IN("6",$(5),"4")),
 				'should continue param numbering': function(topic){
-					assert.equal("IN($1,8,$2) IN(6,$1,4)", topic.sql);
+					assert.equal("IN($1,8,$2) IN(6,$3,4)", topic.sql);
 				},
 				"should add the params without duplicates":function(topic){
-					assert.lengthOf(topic.params, 2);
+					assert.lengthOf(topic.params, 3);
 				}
 			},
 			"duplicate params": {
@@ -225,8 +243,8 @@ vows.describe("sqltokens tests")
 			"additional condition statements": {
 				topic: SQL(AND("1=",$(99), OR("2=", $(2)), OR("2=", $(99)))),
 				'should continue param numbering or reuse a param that has the same value': function(topic){
-					assert.equal("AND(1=$1 OR 2=$2 OR 2=$1)", topic.sql);
-					assert.lengthOf(topic.params, 2);
+					assert.equal("AND(1=$1 OR 2=$2 OR 2=$3)", topic.sql);
+					assert.deepEqual(topic.params, [99,2,99]);
 				}
 			},
 			"arguments that are sql 'bits'": {

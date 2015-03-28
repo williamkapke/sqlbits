@@ -202,7 +202,8 @@ function xBY(token, args){
 
 function Context(){
 	var params=[], sql="";
-	var parameterized;
+    var collapse = !!Context.collapse;
+    var parameterized;
 	var out = this.out = [];
 	function getValues(){
 		if(!parameterized){
@@ -225,7 +226,11 @@ function Context(){
 		sql: {get: getText},
 		text: {get: getText},
 		params: {get: getValues},
-		values: {get: getValues}
+		values: {get: getValues},
+        collapse: {
+            get: function () { return collapse;},
+            set: function (value) { parameterized=false; collapse = value;}
+        }
 	});
 	this.parameterize = function parameterize(out, params){
 		for(var i=0;i<out.length;i++){
@@ -234,13 +239,14 @@ function Context(){
 				var value = item.v;
 				// don't collate nulls, in SQL they are not equal
 				// Can cause inconsistent type deduced error in Postgres
-				var idx = (value === null) ? -1 : params.indexOf(value);
+				var idx = (!collapse || value === null) ? -1 : params.indexOf(value);
 				idx = (~idx? idx+1 : params.push(value) );
 				out[i] = this.createParam(idx);
 			}
 		}
 	};
 }
+Context.collapse = false;
 Context.prototype = {
 	createParam: function(idx){
 		return '$'+idx;

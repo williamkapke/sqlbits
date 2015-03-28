@@ -74,8 +74,8 @@ vows.describe("SELECT/DELETE/INSERT tests")
 			"object with duplicate non-null property values": {
 				topic: INSERT.INTO('foo', { bar: 10, cat: 20, dog: 10 }),
 				'should reuse non-null property values': function(topic){
-					assert.equal("INSERT INTO foo (bar,cat,dog) SELECT $1,$2,$1", topic.sql);
-					assert.lengthOf(topic.params, 2);
+					assert.equal("INSERT INTO foo (bar,cat,dog) SELECT $1,$2,$3", topic.sql);
+					assert.deepEqual(topic.params, [10,20,10]);
 				}
 			},
 			"object with duplicate null params": {
