@@ -1,6 +1,6 @@
 {
 	"name": "sqlbits",
-	"version": "2.1.0",
+	"version": "2.2.0",
 	"description": "An assortment of powerful & well tested functions that assist in building SQL statements",
 	"keywords": ["sql", "builder", "sql builder", "sql helper", "postgres"],
 	"homepage": "http://github.com/williamwicks/sqlbits",
