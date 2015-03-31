@@ -327,7 +327,7 @@ Produces a comma separated `name=Param` pairs.
 ```javascript
 var bits = require('sqlbits'), UPDATE=bits.UPDATE;
 
-console.log(    UPDATE("users").SET({first:"Nic",last:"Wicks"})+""   );
+console.log(    UPDATE("users").SET({first:"Nic",last:"kapke"})+""   );
 //UPDATE users SET first=$1,last=$2
 
 var data = {};
@@ -458,7 +458,7 @@ $ vows
 
 
 ## License
-The MIT License (MIT) Copyright (c) 2013 William Wicks
+The MIT License (MIT) Copyright (c) 2013 William Kapke
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation 

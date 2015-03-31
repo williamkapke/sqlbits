@@ -1,16 +1,16 @@
 {
 	"name": "sqlbits",
-	"version": "2.2.0",
+	"version": "2.2.1",
 	"description": "An assortment of powerful & well tested functions that assist in building SQL statements",
 	"keywords": ["sql", "builder", "sql builder", "sql helper", "postgres"],
-	"homepage": "http://github.com/williamwicks/sqlbits",
+	"homepage": "http://github.com/williamkapke/sqlbits",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/williamwicks/sqlbits.git"
+		"url": "https://github.com/williamkapke/sqlbits.git"
 	},
 	"author"  : {
-		"name"  : "William Wicks",
-		"email" : "wjwicks@gmail.com"
+		"name"  : "William kapke",
+		"email" : "william.kapke@gmail.com"
 	},
 	"devDependencies": {
 		"vows":"*"
